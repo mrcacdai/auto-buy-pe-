@@ -11,9 +11,10 @@
   },
   "scripts": {
     "start": "node index.js",
-    "test": "node test/amount.test.js && node test/shop.test.js",
+    "test": "node test/amount.test.js && node test/shop.test.js && node test/paycrop.test.js",
     "test:amount": "node test/amount.test.js",
     "test:shop": "node test/shop.test.js",
+    "test:paycrop": "node test/paycrop.test.js",
     "sample": "node test/sample-screenshot.js",
     "preview": "node test/panel-preview.js"
   },

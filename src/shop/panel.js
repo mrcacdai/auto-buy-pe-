@@ -556,7 +556,24 @@ async function executeBalancePurchase(ctx, interaction, vnd, ign) {
     const newBalance = balances.getBalance(userId);
     webLog(ctx, `[Số dư] ✅ ${interaction.user.tag} mua thành công ${formatStock(gameMoney)} — IGN: ${ign}`);
 
-    // 8. Thông báo thành công
+    // 8. Thông báo thành công kèm ảnh chụp tách nền /pay
+    const fileName = `pay-balance-${Date.now()}.png`;
+    let shotFile = null;
+    let shotBuffer = null;
+    try {
+      const { renderPayCropScreenshot } = require('../screenshot');
+      shotBuffer = await renderPayCropScreenshot({
+        lines: pay.lines,
+        ign,
+        amount: formatStock(gameMoney),
+      });
+      if (shotBuffer) {
+        shotFile = new AttachmentBuilder(shotBuffer, { name: fileName });
+      }
+    } catch (err) {
+      console.warn(`[Shop] Render pay proof lỗi: ${err.message}`);
+    }
+
     const successEmbed = new EmbedBuilder()
       .setColor(COLOR_OK)
       .setTitle('🎉 Mua Tiền Game Thành Công!')
@@ -575,19 +592,32 @@ async function executeBalancePurchase(ctx, interaction, vnd, ign) {
       )
       .setTimestamp();
 
-    await interaction.reply({ embeds: [successEmbed], flags: MessageFlags.Ephemeral });
-    dmUser(ctx, userId, { embeds: [successEmbed] }).catch(() => {});
+    if (shotFile) {
+      successEmbed.setImage(`attachment://${fileName}`);
+    }
 
-    await notifyAdmin(ctx, {
-      title: 'Đơn mua bằng số dư COMPLETED',
-      fields: [
-        { name: 'Người mua', value: `${interaction.user.tag} (${userId})` },
-        { name: 'IGN', value: ign },
-        { name: 'Tiền game', value: `${formatStock(gameMoney)} (${formatNumber(Number(gameMoney))})` },
-        { name: 'VNĐ đã trừ', value: `-${formatNumber(numericVnd)} VNĐ` },
-        { name: 'Số dư còn lại', value: `${formatNumber(newBalance)} VNĐ` },
-      ],
-    });
+    const replyPayload = shotFile
+      ? { embeds: [successEmbed], files: [shotFile], flags: MessageFlags.Ephemeral }
+      : { embeds: [successEmbed], flags: MessageFlags.Ephemeral };
+    await interaction.reply(replyPayload);
+
+    const dmPayload = shotFile ? { embeds: [successEmbed], files: [shotFile] } : { embeds: [successEmbed] };
+    dmUser(ctx, userId, dmPayload).catch(() => {});
+
+    await notifyAdmin(
+      ctx,
+      {
+        title: 'Đơn mua bằng số dư COMPLETED',
+        fields: [
+          { name: 'Người mua', value: `${interaction.user.tag} (${userId})` },
+          { name: 'IGN', value: ign },
+          { name: 'Tiền game', value: `${formatStock(gameMoney)} (${formatNumber(Number(gameMoney))})` },
+          { name: 'VNĐ đã trừ', value: `-${formatNumber(numericVnd)} VNĐ` },
+          { name: 'Số dư còn lại', value: `${formatNumber(newBalance)} VNĐ` },
+        ],
+      },
+      shotBuffer
+    );
 
     try {
       await sendFeedbackThanks(ctx, {

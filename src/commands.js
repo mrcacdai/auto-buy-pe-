@@ -147,7 +147,7 @@ async function handlePay(interaction, manager, config) {
     // 3) Gửi lệnh /pay trong game, thu phản hồi
     const lines = await manager.pay(ignResult.ign, amountResult.value.toString());
 
-    // 4) Chụp màn hình (3D nếu có dữ liệu chunk, fallback về khung chat)
+    // 4) Chụp màn hình tách nền in-game /pay
     const shot = await takeScreenshot({
       lines,
       meta: screenshotMeta(manager),
@@ -155,9 +155,13 @@ async function handlePay(interaction, manager, config) {
       render3dEnabled: config.render3d,
       camera: { yaw: config.viewYaw, pitch: config.viewPitch },
       watermark: config.screenshotWatermark,
+      isPay: true,
+      ign: ignResult.ign,
+      amount: amountResult.display,
     });
 
     const info = manager.stateInfo();
+    const fileName = `pay-${Date.now()}.png`;
     const embed = new EmbedBuilder()
       .setColor(COLOR_OK)
       .setTitle('💸 Lệnh /pay đã được gửi trong game')
@@ -167,10 +171,11 @@ async function handlePay(interaction, manager, config) {
         { name: '💰 Số tiền', value: `\`${amountResult.display}\``, inline: true },
         { name: '🎮 Tài khoản bot', value: `\`${info.username}\``, inline: true }
       )
-      .setFooter({ text: `Chế độ ảnh: ${shot.mode === '3d' ? 'thế giới 3D' : 'khung chat'} • ảnh cũng đã được gửi tới webhook admin` })
+      .setImage(`attachment://${fileName}`)
+      .setFooter({ text: `Chế độ ảnh: ${shot.mode === 'payCrop' ? 'tách nền chat in-game' : shot.mode === '3d' ? 'thế giới 3D' : 'khung chat'} • ảnh cũng đã được gửi tới webhook admin` })
       .setTimestamp();
 
-    const file = new AttachmentBuilder(shot.buffer, { name: `pay-${Date.now()}.png` });
+    const file = new AttachmentBuilder(shot.buffer, { name: fileName });
     await interaction.editReply({ embeds: [embed], files: [file] });
 
     // 5) Gửi ảnh về webhook admin (yêu cầu số 4)

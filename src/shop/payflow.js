@@ -12,7 +12,7 @@
  *  đang online 24/7 của bot (BedrockManager có sẵn hàng đợi tuần tự).
  */
 
-const { EmbedBuilder } = require('discord.js');
+const { EmbedBuilder, AttachmentBuilder } = require('discord.js');
 const orders = require('./orders');
 const { formatNumber, formatStock } = require('./format');
 const { sendFeedbackThanks } = require('./feedback');
@@ -65,10 +65,15 @@ function webLog(ctx, msg) {
   if (ctx.io) ctx.io.emit('log', line);
 }
 
-/** Gửi embed log tới webhook admin (dùng notifyText có sẵn của bot gốc) */
-async function notifyAdmin(ctx, embed) {
+/** Gửi embed log tới webhook admin (kèm ảnh chụp nếu có) */
+async function notifyAdmin(ctx, embed, shotBuffer = null) {
   try {
-    const { notifyText } = require('../webhook');
+    const { notifyText, notifyScreenshot } = require('../webhook');
+    if (shotBuffer) {
+      const parts = [`📋 **${embed.title}**`, ...embed.fields.map((f) => `• ${f.name}: ${String(f.value).replace(/`/g, '')}`)];
+      await notifyScreenshot(ctx.config, shotBuffer, parts.join('\n').slice(0, 1900));
+      return;
+    }
     const parts = [`📋 **${embed.title}**`, ...embed.fields.map((f) => `• ${f.name}: ${String(f.value).replace(/`/g, '')}`)];
     await notifyText(ctx.config, parts.join('\n').slice(0, 1900));
   } catch {}
@@ -193,7 +198,24 @@ async function completeBankOrder(ctx, order, info = {}) {
 
   webLog(ctx, `✅ Đơn ${orderId}: ĐÃ /pay ${formatStock(gameMoney)} cho ${ign} (${formatNumber(vnd)} ${order.currency ?? 'VNĐ'}).`);
 
-  // Thông báo thành công cho người mua
+  // Thông báo thành công cho người mua kèm ảnh chụp tách nền /pay
+  const fileName = `pay-${orderId}.png`;
+  let shotFile = null;
+  let shotBuffer = null;
+  try {
+    const { renderPayCropScreenshot } = require('../screenshot');
+    shotBuffer = await renderPayCropScreenshot({
+      lines: result.lines,
+      ign,
+      amount: formatStock(gameMoney),
+    });
+    if (shotBuffer) {
+      shotFile = new AttachmentBuilder(shotBuffer, { name: fileName });
+    }
+  } catch (err) {
+    console.warn(`[Shop] Render pay proof lỗi: ${err.message}`);
+  }
+
   const successEmbed = new EmbedBuilder()
     .setColor(COLOR_OK)
     .setTitle('🎉 Mua Tiền Game Thành Công!')
@@ -214,21 +236,30 @@ async function completeBankOrder(ctx, order, info = {}) {
     )
     .setTimestamp();
 
-  await dmUser(ctx, order.userId, { embeds: [successEmbed] });
+  if (shotFile) {
+    successEmbed.setImage(`attachment://${fileName}`);
+  }
+
+  const dmPayload = shotFile ? { embeds: [successEmbed], files: [shotFile] } : { embeds: [successEmbed] };
+  await dmUser(ctx, order.userId, dmPayload);
 
   if (!info.silent) {
-    await notifyAdmin(ctx, {
-      title: 'Đơn hàng COMPLETED',
-      fields: [
-        { name: 'Mã đơn', value: orderId },
-        { name: 'Người mua', value: order.userTag ?? order.userId ?? '—' },
-        { name: 'IGN', value: ign },
-        { name: 'Tiền game', value: `${formatStock(gameMoney)} (${formatNumber(Number(gameMoney))})` },
-        { name: 'Thanh toán', value: `${formatNumber(vnd)} ${order.currency ?? 'VNĐ'}` },
-        { name: 'Phương thức', value: order.paymentMethod ?? 'Ngân hàng' },
-        ...(info.description ? [{ name: 'Nội dung CK', value: info.description.slice(0, 200) }] : []),
-      ],
-    });
+    await notifyAdmin(
+      ctx,
+      {
+        title: 'Đơn hàng COMPLETED',
+        fields: [
+          { name: 'Mã đơn', value: orderId },
+          { name: 'Người mua', value: order.userTag ?? order.userId ?? '—' },
+          { name: 'IGN', value: ign },
+          { name: 'Tiền game', value: `${formatStock(gameMoney)} (${formatNumber(Number(gameMoney))})` },
+          { name: 'Thanh toán', value: `${formatNumber(vnd)} ${order.currency ?? 'VNĐ'}` },
+          { name: 'Phương thức', value: order.paymentMethod ?? 'Ngân hàng' },
+          ...(info.description ? [{ name: 'Nội dung CK', value: info.description.slice(0, 200) }] : []),
+        ],
+      },
+      shotBuffer
+    );
   }
 
   // Lời cảm ơn vào kênh feedback

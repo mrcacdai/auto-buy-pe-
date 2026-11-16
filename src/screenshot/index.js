@@ -4,16 +4,17 @@
  * ============================================================
  *  index.js (screenshot) — Điều phối chế độ chụp màn hình
  * ============================================================
- *  Thứ tự ưu tiên (đúng yêu cầu "cả hai + fallback"):
- *    1. RENDER_3D bật  -> thử dựng ảnh thế giới 3D isometric
- *    2. Thất bại       -> tự động vẽ ảnh khung chat (luôn thành công)
- *
- *  Cả hai chế độ đều phủ lớp HUD có khung chat nên kết quả lệnh /pay
- *  LUÔN hiển thị trên ảnh dù theo cách nào.
+ *  1. Chế độ Pay Crop:
+ *     - Tách sạch background từ ảnh Minecraft thật, thay đoạn chat server
+ *       trả về khi bot thực hiện /pay.
+ *  2. Chế độ 3D / Chat F2:
+ *     - RENDER_3D bật -> thử dựng ảnh thế giới 3D isometric
+ *     - Thất bại       -> tự động vẽ ảnh khung chat HUD F2
  */
 
 const { renderChatScreenshot } = require('./chatRender');
 const { render3dScreenshot } = require('./render3d');
+const { renderPayCropScreenshot, extractPayResponseLine } = require('./payCropRender');
 
 const warn = (...args) => console.warn(`[${new Date().toLocaleString('vi-VN', { hour12: false })}] [Shot]`, ...args);
 
@@ -25,10 +26,32 @@ const warn = (...args) => console.warn(`[${new Date().toLocaleString('vi-VN', { 
  * @param {{center?: {x,y,z}, blocks?: Array}|null} [p.world] Dữ liệu thế giới (tuỳ chọn)
  * @param {boolean} [p.render3dEnabled=true]
  * @param {{yaw?: number, pitch?: number, fov?: number}} [p.camera] Hướng nhìn bot khi render 3D
- * @param {boolean} [p.watermark=false] In tên server/phiên bản lên ảnh (mặc định tắt — ảnh F2 "sạch")
- * @returns {Promise<{buffer: Buffer, mode: '3d'|'chat'}>}
+ * @param {boolean} [p.watermark=false] In tên server/phiên bản lên ảnh
+ * @param {boolean} [p.isPay=false] Sử dụng chế độ ảnh tách nền /pay
+ * @param {string} [p.ign] Tên người nhận (cho chế độ /pay)
+ * @param {string} [p.amount] Số tiền (cho chế độ /pay)
+ * @returns {Promise<{buffer: Buffer, mode: 'payCrop'|'3d'|'chat'}>}
  */
-async function takeScreenshot({ lines = [], meta = {}, world = null, render3dEnabled = true, camera = null, watermark = false }) {
+async function takeScreenshot({
+  lines = [],
+  meta = {},
+  world = null,
+  render3dEnabled = true,
+  camera = null,
+  watermark = false,
+  isPay = false,
+  ign = '',
+  amount = '',
+}) {
+  if (isPay) {
+    try {
+      const buffer = await renderPayCropScreenshot({ lines, ign, amount });
+      return { buffer, mode: 'payCrop' };
+    } catch (err) {
+      warn(`Render Pay Crop thất bại (${err.message}) — fallback về khung chat.`);
+    }
+  }
+
   if (render3dEnabled && world?.center && Array.isArray(world.blocks)) {
     try {
       const buffer = await render3dScreenshot({ world, lines, meta, camera: camera ?? {} });
@@ -42,4 +65,8 @@ async function takeScreenshot({ lines = [], meta = {}, world = null, render3dEna
   return { buffer, mode: 'chat' };
 }
 
-module.exports = { takeScreenshot };
+module.exports = {
+  takeScreenshot,
+  renderPayCropScreenshot,
+  extractPayResponseLine,
+};

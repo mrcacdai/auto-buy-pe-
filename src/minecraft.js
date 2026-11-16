@@ -499,12 +499,18 @@ class BedrockManager extends EventEmitter {
       outputAt = Date.now();
       for (const item of packet?.output ?? []) {
         const text = stripMcCodes(item?.message);
-        if (text) lines.push({ kind: item?.success === false ? 'err' : 'ok', text });
+        if (text) lines.push({ kind: item?.success === false ? 'err' : 'ok', text, raw: item?.message });
       }
     };
     const onText = (packet) => {
       const text = textPacketToLine(packet);
-      if (text) lines.push({ kind: 'chat', text });
+      if (text) {
+        const lower = text.toLowerCase();
+        const isSuccess = lower.includes('paid') || lower.includes('chuyển') || lower.includes('sent');
+        const isError = lower.includes('error') || lower.includes('không đủ') || lower.includes('not enough') || lower.includes('không thể');
+        const kind = isError ? 'err' : isSuccess ? 'ok' : 'chat';
+        lines.push({ kind, text, raw: packet?.message || text });
+      }
     };
 
     client.on('command_output', onCommandOutput);
