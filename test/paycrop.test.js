@@ -1,10 +1,18 @@
 'use strict';
 
 const assert = require('assert');
-const { renderPayCropScreenshot, extractPayResponseLine } = require('../src/screenshot/payCropRender');
+const { renderPayCropScreenshot, extractPayResponseLine, stripTaxInfo } = require('../src/screenshot/payCropRender');
 
 (async () => {
-  console.log('--- Test extractPayResponseLine ---');
+  console.log('--- Test stripTaxInfo (xóa tax) ---');
+  assert.strictEqual(stripTaxInfo('You paid hoffi116 $ 2M (+$ 40k tax)'), 'You paid hoffi116 $ 2M');
+  assert.strictEqual(stripTaxInfo('You paid hoffi116 $ 2M (+ 40K tax)'), 'You paid hoffi116 $ 2M');
+  assert.strictEqual(stripTaxInfo('§fYou paid §ehoffi116 §a$ 2M §7(+§a$ 40k§7 tax)'), '§fYou paid §ehoffi116 §a$ 2M');
+  assert.strictEqual(stripTaxInfo('You paid steve $ 10M (+ $ 500k tax)'), 'You paid steve $ 10M');
+  assert.strictEqual(stripTaxInfo('You paid notch $ 1M'), 'You paid notch $ 1M');
+  console.log('✓ stripTaxInfo: loại bỏ hoàn toàn (+ 40k tax) khỏi mọi định dạng chuỗi');
+
+  console.log('\n--- Test extractPayResponseLine ---');
 
   // Test 1: extract with lines containing 'paid'
   const lines1 = [
@@ -13,6 +21,7 @@ const { renderPayCropScreenshot, extractPayResponseLine } = require('../src/scre
   ];
   const r1 = extractPayResponseLine(lines1, 'hoffi116', '2M');
   assert.ok(r1.includes('hoffi116'), 'Phải tìm thấy dòng chứa hoffi116');
+  assert.strictEqual(r1.toLowerCase().includes('tax'), false, 'Phải xóa bỏ (+ 40k tax)');
   console.log('✓ extractPayResponseLine: tìm thấy dòng chat phản hồi');
 
   // Test 2: empty lines fallback

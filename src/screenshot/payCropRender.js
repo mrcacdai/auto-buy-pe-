@@ -100,6 +100,20 @@ function parseSegments(rawText) {
 }
 
 /**
+ * Loại bỏ phần thông tin thuế (tax) nếu có trong câu thông báo server,
+ * ví dụ: "(+$ 40k tax)", "(+ 40k tax)", "(+ 40,000 tax)", "(tax...)", "(thuế...)"
+ */
+function stripTaxInfo(text) {
+  if (!text) return '';
+  return String(text)
+    // Bỏ ngoặc chứa tax / thuế bất kể thứ tự
+    .replace(/\s*(?:[§&][0-9a-fk-or])*\s*\([^)]*(?:tax|thuế)[^)]*\)/gi, '')
+    // Bỏ mã màu thừa ở cuối chuỗi nếu có
+    .replace(/(?:[§&][0-9a-fk-or])+\s*$/gi, '')
+    .trim();
+}
+
+/**
  * Tìm dòng phản hồi hợp lý nhất từ mảng phản hồi in-game của server
  */
 function extractPayResponseLine(lines, ign = '', amount = '') {
@@ -119,16 +133,16 @@ function extractPayResponseLine(lines, ign = '', amount = '') {
   for (const line of nonCmd) {
     const textLower = String(line.text || '').toLowerCase();
     if (keywords.some((k) => textLower.includes(k)) || (ignLower && textLower.includes(ignLower))) {
-      return line.raw || line.text;
+      return stripTaxInfo(line.raw || line.text);
     }
   }
 
   // Dòng ok hoặc chat cuối cùng
   const lastOkOrChat = [...nonCmd].reverse().find((l) => l.kind === 'ok' || l.kind === 'chat');
-  if (lastOkOrChat) return lastOkOrChat.raw || lastOkOrChat.text;
+  if (lastOkOrChat) return stripTaxInfo(lastOkOrChat.raw || lastOkOrChat.text);
 
   const lastLine = nonCmd[nonCmd.length - 1];
-  return lastLine.raw || lastLine.text || `You paid ${ign} $ ${amount || ''}`.trim();
+  return stripTaxInfo(lastLine.raw || lastLine.text || `You paid ${ign} $ ${amount || ''}`.trim());
 }
 
 /**
@@ -143,7 +157,8 @@ function extractPayResponseLine(lines, ign = '', amount = '') {
 async function renderPayCropScreenshot({ lines = [], text = '', ign = '', amount = '' } = {}) {
   ensureFont();
 
-  const displayText = (text || extractPayResponseLine(lines, ign, amount)).trim();
+  const rawDisplay = (text || extractPayResponseLine(lines, ign, amount)).trim();
+  const displayText = stripTaxInfo(rawDisplay);
   const bg = await getBackground();
 
   const fontName = fontRegistered ? 'MinecraftPay' : 'Courier New, monospace';
@@ -216,4 +231,5 @@ async function renderPayCropScreenshot({ lines = [], text = '', ign = '', amount
 module.exports = {
   renderPayCropScreenshot,
   extractPayResponseLine,
+  stripTaxInfo,
 };

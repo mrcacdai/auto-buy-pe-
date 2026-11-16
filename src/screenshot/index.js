@@ -14,7 +14,7 @@
 
 const { renderChatScreenshot } = require('./chatRender');
 const { render3dScreenshot } = require('./render3d');
-const { renderPayCropScreenshot, extractPayResponseLine } = require('./payCropRender');
+const { renderPayCropScreenshot, extractPayResponseLine, stripTaxInfo } = require('./payCropRender');
 
 const warn = (...args) => console.warn(`[${new Date().toLocaleString('vi-VN', { hour12: false })}] [Shot]`, ...args);
 
@@ -69,4 +69,5 @@ module.exports = {
   takeScreenshot,
   renderPayCropScreenshot,
   extractPayResponseLine,
+  stripTaxInfo,
 };
