@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="vi" data-glow="on">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="color-scheme" content="dark" />
+  <title>BedrockPay — Nova Panel</title>
+  <link rel="stylesheet" href="/style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Wix+Madefor+Display:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='4' y='4' width='24' height='24' rx='7' fill='%2305070a'/%3E%3Cpath d='M10 21V11l6 5 6-5v10' stroke='%2322d3ee' stroke-width='2.4' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" />
+</head>
+<body>
+  <!-- ═══════════ COSMIC BACKGROUND ═══════════ -->
+  <div class="bg-cosmic" aria-hidden="true">
+    <div class="cosmic-glow cosmic-glow-1"></div>
+    <div class="cosmic-glow cosmic-glow-2"></div>
+    <div class="cosmic-grid"></div>
+  </div>
+
+  <!-- ═══════════════ SIDEBAR ═══════════════ -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon glow-cyan">
+        <svg viewBox="0 0 32 32" width="22" height="22" fill="none"><path d="M10 21V11l6 5 6-5v10" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="brand-text">
+        <h1>Bedrock<span class="text-gradient">Pay</span></h1>
+        <span data-i18n="brand.sub">Nova Panel</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a href="#" class="nav-item active" data-section="dashboard">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="7.5" height="7.5" rx="2"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="2"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="2"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="2"/></svg>
+        <span data-i18n="nav.dashboard">Tổng Quan</span>
+      </a>
+      <a href="#" class="nav-item" data-section="stats">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none"><path d="M4 19V10m5.5 9V5M15 19v-6m5 6V8" stroke-linecap="round" stroke-width="2.2" class="si-stroke"/></svg>
+        <span data-i18n="nav.stats">Thống Kê</span><span class="nav-badge" data-i18n="nav.badgeNew">Mới</span>
+      </a>
+      <a href="#" class="nav-item" data-section="config">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.8v2.6m0 13.2v2.6M2.8 12h2.6m13.2 0h2.6M5.5 5.5l1.8 1.8m9.4 9.4 1.8 1.8m0-13-1.8 1.8M7.3 16.7l-1.8 1.8" stroke-linecap="round"/></svg>
+        <span data-i18n="nav.config">Cấu Hình</span>
+      </a>
+      <a href="#" class="nav-item" data-section="orders">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none"><path d="M6 3h12a1 1 0 0 1 1 1v16.2a.8.8 0 0 1-1.3.6L15 18.6l-2.7 2.2a.8.8 0 0 1-1 0L8.6 18.6 6 20.8a.8.8 0 0 1-1.3-.6V4a1 1 0 0 1 1-1Z" stroke-width="1.8" class="si-stroke"/><path d="M8.5 8h7m-7 4h5" stroke-linecap="round" stroke-width="1.8" class="si-stroke"/></svg>
+        <span data-i18n="nav.orders">Đơn Hàng</span>
+      </a>
+      <a href="#" class="nav-item" data-section="balances">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none"><rect x="2.8" y="5.5" width="18.4" height="13" rx="3"/><path d="M2.8 10h18.4" stroke-width="1.8" class="si-stroke"/><path d="M6.5 14.5h4" stroke-linecap="round" stroke-width="1.8" class="si-stroke"/></svg>
+        <span data-i18n="nav.balances">Số Dư</span>
+      </a>
+      <a href="#" class="nav-item" data-section="console">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none"><rect x="2.8" y="4" width="18.4" height="16" rx="3"/><path d="m7 9.5 3 3-3 3m5.5.5H17" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" class="si-stroke"/></svg>
+        <span data-i18n="nav.console">Console</span>
+      </a>
+      <a href="#" class="nav-item" data-section="settings">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none"><path d="M4.5 7h9m4 0h2m-15 10h2m4 0h9" stroke-linecap="round" stroke-width="1.8" class="si-stroke"/><circle cx="15.5" cy="7" r="2.2"/><circle cx="8.5" cy="17" r="2.2"/></svg>
+        <span data-i18n="nav.settings">Cài Đặt</span>
+      </a>
+      <a href="#" class="nav-item nav-logout" id="sideLogoutBtn">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="si-stroke"/></svg>
+        <span data-i18n="nav.logout">Đăng Xuất</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer glass-card">
+      <div class="server-info">
+        <span class="server-dot" id="sideDot"></span>
+        <span id="sideServer" data-i18n="side.notConnected">Chưa kết nối</span>
+      </div>
+      <div class="server-info muted">
+        <svg viewBox="0 0 24 24" width="13" height="13" fill="none"><path d="M12 3 4 8l8 5 8-5-8-5Zm-8 9 8 5 8-5m-16 4.5 8 5 8-5" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+        <span id="sideVersion">Minecraft Bedrock</span>
+      </div>
+      <div class="server-info muted">
+        <span class="uptime-dot"></span>
+        <span id="sideUptime">—</span>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+  <!-- ═══════════════ MAIN ═══════════════ -->
+  <div class="content">
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="icon-btn menu-btn" id="menuBtn" aria-label="Menu">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
+        <h2 id="pageTitle">Tổng Quan</h2>
+      </div>
+      <div class="topbar-right">
+        <div class="status-pills">
+          <div class="pill" id="pillMC" title="Minecraft"><span class="pill-dot"></span><span data-i18n="pill.mc">Minecraft</span></div>
+          <div class="pill" id="pillDiscord" title="Discord"><span class="pill-dot"></span><span data-i18n="pill.discord">Discord</span></div>
+          <div class="pill" id="pillShop" title="Shop"><span class="pill-dot"></span><span data-i18n="pill.shop">Shop</span></div>
+        </div>
+        <button class="icon-btn" id="cmdkBtn" title="⌘K" aria-label="Command palette">
+          <svg viewBox="0 0 24 24" width="17" height="17" fill="none"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M8.5 11h5m-2.5-2.5v5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        </button>
+        <div class="lang-switch" id="langSwitch" role="group" aria-label="Language">
+          <button class="lang-opt active" data-lang="vi">VI</button>
+          <button class="lang-opt" data-lang="en">EN</button>
+        </div>
+        <button class="icon-btn" id="glowToggle" data-i18n-title="topbar.glow" title="Hiệu ứng phát sáng" aria-label="Glow">
+          <svg viewBox="0 0 24 24" width="17" height="17" fill="none"><path d="M12 3v3m0 12v3M3 12h3m12 0h3M5.6 5.6l2.1 2.1m8.6 8.6 2.1 2.1m0-12.8-2.1 2.1M7.7 16.3l-2.1 2.1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="12" r="3" fill="currentColor" opacity=".9"/></svg>
+        </button>
+        <button class="icon-btn" id="logoutBtn" data-i18n-title="topbar.logout" title="Đăng xuất" aria-label="Logout">
+          <svg viewBox="0 0 24 24" width="17" height="17" fill="none"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- ═══════ DASHBOARD ═══════ -->
+    <section class="section active" id="section-dashboard">
+      <div class="stats-row">
+        <div class="stat-card glass-card">
+          <div class="stat-icon stat-icon-cyan glow-cyan">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none"><rect x="4" y="4" width="16" height="16" rx="4"/><path d="M9 15V9l6 4.5V9" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" class="si-stroke"/></svg>
+          </div>
+          <div class="stat-info"><span class="stat-label" data-i18n="kpi.bot">Bot Minecraft</span><span class="stat-value" id="dashBot">—</span><span class="stat-sub" id="dashBotSub">—</span></div>
+        </div>
+        <div class="stat-card glass-card">
+          <div class="stat-icon stat-icon-green">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none"><path d="m12 3 8 4.5v9L12 21l-8-4.5v-9L12 3Z" stroke-width="1.8" class="si-stroke"/><path d="m4 7.5 8 4.5 8-4.5M12 12v9" stroke-width="1.8" class="si-stroke"/></svg>
+          </div>
+          <div class="stat-info"><span class="stat-label" data-i18n="kpi.stock">Kho Hàng</span><span class="stat-value" id="dashStock">—</span><span class="stat-sub" id="dashStockSub" data-i18n="kpi.stockSub">tiền game có sẵn</span></div>
+        </div>
+        <div class="stat-card glass-card">
+          <div class="stat-icon stat-icon-violet">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none"><path d="M3.5 8h17v9a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2V8Z" stroke-width="1.8" class="si-stroke"/><path d="M3.5 8 5 5h14l1.5 3m-8 0v11m-3-7.5h6" stroke-linecap="round" stroke-width="1.8" class="si-stroke"/></svg>
+          </div>
+          <div class="stat-info"><span class="stat-label" data-i18n="kpi.price">Giá Hiện Tại</span><span class="stat-value" id="dashPrice">—</span><span class="stat-sub" id="dashPriceSub" data-i18n="kpi.priceSub">tỷ giá bán</span></div>
+        </div>
+        <div class="stat-card glass-card">
+          <div class="stat-icon stat-icon-amber">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2" stroke-linecap="round" stroke-width="1.8" class="si-stroke"/></svg>
+          </div>
+          <div class="stat-info"><span class="stat-label" data-i18n="kpi.pending">Đơn Chờ</span><span class="stat-value" id="dashPending">—</span><span class="stat-sub" id="dashPendingSub">—</span></div>
+        </div>
+      </div>
+
+      <div class="dash-mid">
+        <div class="card glass-card card-hero">
+          <div class="banner-content">
+            <h2 id="heroTitle" data-i18n="hero.title">Minecraft Bedrock Pay Bot</h2>
+            <p id="heroSub" data-i18n="hero.sub">Bot /pay 24/7 + Shop tự động: Panel Discord, QR ngân hàng, thẻ cào, số dư cá nhân</p>
+            <div class="quick-actions">
+              <button class="btn btn-secondary" id="btnReconnect">
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="none"><path d="M20 12a8 8 0 1 1-2.34-5.66M20 4v4h-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <span data-i18n="qa.reconnect">Kết nối lại MC</span>
+              </button>
+              <button class="btn btn-danger" id="btnBotOff"><span data-i18n="qa.botOff">Tắt bot mua</span></button>
+              <button class="btn btn-success" id="btnBotOn"><span data-i18n="qa.botOn">Bật bot mua</span></button>
+              <button class="btn btn-primary" id="btnBalance"><span data-i18n="qa.balance">Xem số dư bot</span></button>
+            </div>
+          </div>
+        </div>
+        <div class="card glass-card card-revchart">
+          <div class="card-head"><span data-i18n="dash.revenue14">Doanh thu 14 ngày</span><span class="badge-live" id="liveBadge">● LIVE</span></div>
+          <div class="rev-hero" id="revToday">—</div>
+          <div class="rev-sub" id="revTodaySub" data-i18n="dash.revenueToday">hôm nay</div>
+          <div class="chart-box" id="dashRevChart"></div>
+        </div>
+      </div>
+
+      <div class="dash-bottom">
+        <div class="card glass-card">
+          <div class="card-head">
+            <span data-i18n="dash.recentOrders">Đơn Hàng Gần Nhất</span>
+            <button class="btn btn-ghost btn-sm" id="btnRefreshOrders">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none"><path d="M20 12a8 8 0 1 1-2.34-5.66M20 4v4h-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span data-i18n="common.refresh">Làm mới</span>
+            </button>
+          </div>
+          <div class="table-wrap">
+            <table class="data-table" id="ordersTableMini">
+              <thead><tr>
+                <th data-i18n="orders.id">Mã đơn</th><th data-i18n="orders.buyer">Người mua</th><th data-i18n="orders.ign">IGN</th>
+                <th data-i18n="orders.gameMoney">Tiền game</th><th data-i18n="orders.vnd">VNĐ</th>
+                <th data-i18n="orders.method">Phương thức</th><th data-i18n="orders.status">Trạng thái</th>
+              </tr></thead>
+              <tbody><tr><td colspan="7" class="empty" data-i18n="orders.empty">Chưa có đơn hàng</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card glass-card">
+          <div class="card-head"><span data-i18n="dash.miniConsole">Console Nhanh</span><span class="badge-live">● LIVE</span></div>
+          <div class="mini-console" id="miniConsole"><p class="log-line log-system" data-i18n="console.waiting">Đang chờ log…</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════ STATS (mới) ═══════ -->
+    <section class="section" id="section-stats">
+      <div class="stats-row">
+        <div class="stat-card glass-card"><div class="stat-info"><span class="stat-label" data-i18n="stats.totalOrders">Tổng đơn hàng</span><span class="stat-value" id="stTotalOrders">—</span></div></div>
+        <div class="stat-card glass-card"><div class="stat-info"><span class="stat-label" data-i18n="stats.completed">Đã hoàn thành</span><span class="stat-value text-ok" id="stCompleted">—</span></div></div>
+        <div class="stat-card glass-card"><div class="stat-info"><span class="stat-label" data-i18n="stats.revenue">Tổng doanh thu</span><span class="stat-value" id="stRevenue">—</span></div></div>
+        <div class="stat-card glass-card"><div class="stat-info"><span class="stat-label" data-i18n="stats.revenueToday">Doanh thu hôm nay</span><span class="stat-value text-gradient" id="stRevenueToday">—</span></div></div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="card glass-card">
+          <div class="card-head">
+            <span data-i18n="stats.revenueChart">Doanh thu 14 ngày qua</span>
+            <button class="btn btn-ghost btn-sm" id="btnRefreshStats"><span data-i18n="common.refresh">Làm mới</span></button>
+          </div>
+          <div class="chart-box chart-box-lg" id="revChart"></div>
+        </div>
+        <div class="card glass-card">
+          <div class="card-head"><span data-i18n="stats.byStatus">Đơn theo trạng thái</span></div>
+          <div class="donut-wrap">
+            <div class="chart-donut" id="statusDonut"></div>
+            <div class="chart-legend" id="statusLegend"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="card glass-card">
+          <div class="card-head"><span data-i18n="stats.byMethod">Phương thức thanh toán</span></div>
+          <div class="bars-wrap" id="methodBars"></div>
+        </div>
+        <div class="card glass-card">
+          <div class="card-head"><span data-i18n="stats.topBuyers">Khách hàng thân thiết</span></div>
+          <div class="top-buyers" id="topBuyers"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════ CONFIG ═══════ -->
+    <section class="section" id="section-config">
+      <div class="config-grid">
+        <div class="card glass-card">
+          <div class="card-head"><span data-i18n="cfg.price.title">Cấu Hình Giá</span></div>
+          <div class="card-content">
+            <form id="priceForm">
+              <div class="form-field">
+                <label for="baseAmount" data-i18n="cfg.price.baseAmount">Số tiền game gốc</label>
+                <div class="input-wrapper"><input type="text" id="baseAmount" placeholder="1000000" /><span class="input-suffix">💎</span></div>
+              </div>
+              <div class="form-row">
+                <div class="form-field">
+                  <label for="basePrice" data-i18n="cfg.price.basePrice">Giá bán</label>
+                  <div class="input-wrapper"><input type="text" id="basePrice" placeholder="10000" /><span class="input-suffix">₫</span></div>
+                </div>
+                <div class="form-field">
+                  <label for="currency" data-i18n="cfg.price.currency">Đơn vị</label>
+                  <div class="input-wrapper"><input type="text" id="currency" placeholder="VND" /></div>
+                </div>
+              </div>
+              <div class="price-display glow-cyan" id="pricePreview">—</div>
+              <p class="hint" data-i18n="cfg.price.hint">Lưu giá sẽ tự cập nhật Panel Discord sau ~2 giây.</p>
+              <button type="submit" class="btn btn-primary" data-i18n="cfg.price.save">Cập Nhật Giá</button>
+            </form>
+          </div>
+        </div>
+
+        <div class="card glass-card">
+          <div class="card-head"><span data-i18n="cfg.stock.title">Kho Hàng</span></div>
+          <div class="card-content">
+            <div class="stock-hero">
+              <div class="stock-ring glow-cyan"><span class="stock-number" id="stockDisplay">0</span></div>
+              <span class="stock-subtitle" data-i18n="cfg.stock.subtitle">tiền game có sẵn</span>
+            </div>
+            <form id="stockForm" class="stock-form">
+              <div class="input-wrapper">
+                <input type="text" id="stockInput" data-i18n-placeholder="cfg.stock.placeholder" placeholder="Nhập mới hoặc +50m / -20m (VD: 1b)" />
+                <span class="input-suffix">📦</span>
+              </div>
+              <div class="chip-row" id="stockChips">
+                <button type="button" class="chip">1m</button><button type="button" class="chip">10m</button>
+                <button type="button" class="chip">100m</button><button type="button" class="chip">1b</button>
+                <button type="button" class="chip">+50m</button><button type="button" class="chip">-20m</button>
+              </div>
+              <button type="submit" class="btn btn-secondary" data-i18n="cfg.stock.save">Cập Nhật Kho</button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <div class="config-grid" style="margin-top:1rem;">
+        <div class="card glass-card">
+          <div class="card-head"><span data-i18n="cfg.server.title">Server Minecraft Bedrock</span></div>
+          <div class="card-content">
+            <form id="serverForm">
+              <div class="form-row">
+                <div class="form-field" style="flex:2;">
+                  <label for="serverHost">IP / Domain</label>
+                  <div class="input-wrapper"><input type="text" id="serverHost" data-i18n-placeholder="cfg.server.hostPh" placeholder="vd: play.example.net" /><span class="input-suffix">🌐</span></div>
+                </div>
+                <div class="form-field">
+                  <label for="serverPort" data-i18n="cfg.server.port">Port</label>
+                  <div class="input-wrapper"><input type="text" id="serverPort" placeholder="19132" /><span class="input-suffix">🔌</span></div>
+                </div>
+              </div>
+              <div class="price-display" id="serverPreview">—</div>
+              <button type="submit" class="btn btn-primary" data-i18n="cfg.server.save">Đổi Server (ping trước khi vào)</button>
+            </form>
+          </div>
+        </div>
+
+        <div class="card glass-card">
+          <div class="card-head"><span data-i18n="cfg.ctrl.title">Điều Khiển Bot</span></div>
+          <div class="card-content">
+            <div class="ctrl-status" id="ctrlStatus">—</div>
+            <div class="quick-actions" style="margin-top:1rem;">
+              <button class="btn btn-secondary" id="btnReconnect2" data-i18n="cfg.ctrl.reconnect">Kết nối lại</button>
+              <button class="btn btn-danger" id="btnBotOff2">botoff</button>
+              <button class="btn btn-success" id="btnBotOn2">onbot</button>
+            </div>
+            <p class="hint" data-i18n="cfg.ctrl.hint">botoff = bot out server + khóa nút Mua trên Panel Discord. onbot = vào lại server.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════ ORDERS ═══════ -->
+    <section class="section" id="section-orders">
+      <div class="card glass-card card-full">
+        <div class="card-head">
+          <span><span data-i18n="orders.allTitle">Tất Cả Đơn Hàng</span> <span class="muted" id="ordersCount"></span></span>
+          <div class="orders-toolbar">
+            <div class="input-wrapper input-search">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+              <input type="text" id="orderSearch" data-i18n-placeholder="orders.searchPh" placeholder="Tìm mã đơn / IGN / người mua…" />
+            </div>
+            <select id="orderStatus" class="select">
+              <option value="all" data-i18n="orders.allStatus">Tất cả trạng thái</option>
+              <option value="COMPLETED" data-i18n="st.COMPLETED">Hoàn thành</option>
+              <option value="PENDING_PAYMENT" data-i18n="st.PENDING_PAYMENT">Chờ CK</option>
+              <option value="PROCESSING" data-i18n="st.PROCESSING">Đang xử lý</option>
+              <option value="WAITING_RETRY" data-i18n="st.WAITING_RETRY">Chờ giao lại</option>
+              <option value="EXPIRED" data-i18n="st.EXPIRED">Hết hạn</option>
+              <option value="FAILED" data-i18n="st.FAILED">Thất bại</option>
+            </select>
+            <select id="orderSort" class="select">
+              <option value="time_desc" data-i18n="orders.sortNew">Mới nhất</option>
+              <option value="time_asc" data-i18n="orders.sortOld">Cũ nhất</option>
+              <option value="money_desc" data-i18n="orders.sortMoneyDesc">Tiền giảm dần</option>
+              <option value="money_asc" data-i18n="orders.sortMoneyAsc">Tiền tăng dần</option>
+            </select>
+            <button class="btn btn-ghost btn-sm" id="btnExportCsv" data-i18n="orders.exportCsv">Xuất CSV</button>
+            <button class="btn btn-ghost btn-sm" id="btnRefreshOrders2"><span data-i18n="common.refresh">Làm mới</span></button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table class="data-table" id="ordersTable">
+            <thead><tr>
+              <th data-i18n="orders.id">Mã đơn</th><th data-i18n="orders.time">Thời gian</th><th data-i18n="orders.buyer">Người mua</th>
+              <th data-i18n="orders.ign">IGN</th><th data-i18n="orders.gameMoney">Tiền game</th><th data-i18n="orders.vnd">VNĐ</th>
+              <th data-i18n="orders.method">Phương thức</th><th data-i18n="orders.status">Trạng thái</th>
+            </tr></thead>
+            <tbody><tr><td colspan="8" class="empty" data-i18n="orders.empty">Chưa có đơn hàng</td></tr></tbody>
+          </table>
+        </div>
+        <div class="pager" id="ordersPager"></div>
+      </div>
+    </section>
+
+    <!-- ═══════ BALANCES ═══════ -->
+    <section class="section" id="section-balances">
+      <div class="config-grid">
+        <div class="card glass-card">
+          <div class="card-head">
+            <span data-i18n="bal.title">Số Dư Thành Viên</span>
+            <div class="input-wrapper input-search">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+              <input type="text" id="balSearch" data-i18n-placeholder="bal.searchPh" placeholder="Tìm User ID…" />
+            </div>
+          </div>
+          <div class="bal-chips">
+            <span class="chip chip-static"><span data-i18n="bal.members">Thành viên</span>: <b id="balTotalMembers">0</b></span>
+            <span class="chip chip-static"><span data-i18n="bal.total">Tổng số dư</span>: <b id="balTotalVnd">0 ₫</b></span>
+          </div>
+          <div class="table-wrap">
+            <table class="data-table" id="balancesTable">
+              <thead><tr><th>Discord User ID</th><th data-i18n="bal.balanceCol">Số dư (VNĐ)</th></tr></thead>
+              <tbody><tr><td colspan="2" class="empty" data-i18n="bal.empty">Chưa có ai nạp</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card glass-card">
+          <div class="card-head"><span data-i18n="bal.adjust">Cộng / Trừ Số Dư</span></div>
+          <div class="card-content">
+            <form id="balanceForm">
+              <div class="form-field">
+                <label for="balUserId">Discord User ID</label>
+                <div class="input-wrapper"><input type="text" id="balUserId" placeholder="123456789012345678" /><span class="input-suffix">🆔</span></div>
+              </div>
+              <div class="form-field">
+                <label for="balAmount" data-i18n="bal.amount">Số tiền VNĐ</label>
+                <div class="input-wrapper"><input type="text" id="balAmount" data-i18n-placeholder="bal.amountPh" placeholder="50000 hoặc 50k" /><span class="input-suffix">₫</span></div>
+              </div>
+              <div class="quick-actions">
+                <button type="button" class="btn btn-success" id="btnBalAdd"><span data-i18n="bal.add">Cộng</span></button>
+                <button type="button" class="btn btn-danger" id="btnBalDeduct"><span data-i18n="bal.deduct">Trừ</span></button>
+              </div>
+              <p class="hint" data-i18n="bal.hint">Hỗ trợ viết tắt: 50k = 50.000₫, 1.5tr = 1.500.000₫.</p>
+            </form>
+          </div>
+        </div>
+      </div>
+      <div class="card glass-card" style="margin-top:1rem;">
+        <div class="card-head"><span data-i18n="bal.history">Lịch Sử Biến Động</span></div>
+        <div class="table-wrap">
+          <table class="data-table" id="historyTable">
+            <thead><tr>
+              <th data-i18n="orders.time">Thời gian</th><th data-i18n="bal.user">User</th><th data-i18n="bal.type">Loại</th>
+              <th data-i18n="bal.amountCol">Số tiền</th><th data-i18n="bal.reason">Lý do</th>
+            </tr></thead>
+            <tbody><tr><td colspan="5" class="empty" data-i18n="bal.noHistory">Chưa có lịch sử</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════ CONSOLE ═══════ -->
+    <section class="section" id="section-console">
+      <div class="card glass-card card-full">
+        <div class="card-head">
+          <div class="console-title-bar">
+            <span data-i18n="console.title">Live Console</span>
+            <span class="badge-live" id="consoleLive">● LIVE</span>
+            <span class="muted" id="consoleCount"></span>
+          </div>
+          <div style="display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;">
+            <label class="toggle"><input type="checkbox" id="onlyChat" /> <span data-i18n="console.onlyChat">Chỉ hiện chat in-game</span></label>
+            <label class="toggle"><input type="checkbox" id="autoScroll" checked /> <span data-i18n="console.autoScroll">Tự cuộn</span></label>
+            <button id="clearConsole" class="btn btn-ghost btn-sm" data-i18n="console.clear">Xóa</button>
+          </div>
+        </div>
+        <div class="console-body" id="console"><p class="log-line log-system" data-i18n="console.waiting">Đang chờ log…</p></div>
+        <div class="console-input-row">
+          <form id="chatForm" style="display:flex;gap:.5rem;flex:1;">
+            <input type="text" id="chatInput" data-i18n-placeholder="console.inputPh" placeholder="Gõ lệnh (vd: /spawn) hoặc tin nhắn chat vào game..." style="flex:1;" autocomplete="off" />
+            <button type="submit" class="btn btn-primary" style="width:auto;padding:0 1.5rem;" data-i18n="console.send">Gửi</button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════ SETTINGS ═══════ -->
+    <section class="section" id="section-settings">
+      <div class="config-grid">
+        <div class="card glass-card">
+          <div class="card-head"><span data-i18n="set.appearance">Giao Diện</span></div>
+          <div class="card-content">
+            <div class="form-field">
+              <label data-i18n="set.language">Ngôn ngữ</label>
+              <div class="lang-switch lang-switch-lg" id="langSwitch2">
+                <button class="lang-opt active" data-lang="vi">🇻🇳 Tiếng Việt</button>
+                <button class="lang-opt" data-lang="en">🇬🇧 English</button>
+              </div>
+            </div>
+            <div class="form-field">
+              <label data-i18n="set.glow">Hiệu ứng phát sáng (glow)</label>
+              <label class="toggle-row">
+                <span id="glowState">Bật</span>
+                <span class="switch"><input type="checkbox" id="setGlow" checked /><i></i></span>
+              </label>
+              <p class="hint" data-i18n="set.glowHint">Tắt nếu máy yếu — panel vẫn giữ phong cách neon.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="card glass-card">
+          <div class="card-head"><span data-i18n="set.security">Bảo Mật</span></div>
+          <div class="card-content">
+            <form id="keyForm">
+              <div class="form-field">
+                <label for="setKey" data-i18n="set.panelKey">Khóa panel (PANEL_PASSWORD)</label>
+                <div class="input-wrapper"><input type="password" id="setKey" data-i18n-placeholder="set.keyPh" placeholder="Nhập khóa mới..." /><span class="input-suffix">🔑</span></div>
+              </div>
+              <button type="submit" class="btn btn-primary" data-i18n="set.saveKey">Lưu khóa vào máy này</button>
+              <p class="hint" data-i18n="set.keyHint">Khóa chỉ lưu trong localStorage của trình duyệt này, không gửi đi đâu khác.</p>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <div class="config-grid" style="margin-top:1rem;">
+        <div class="card glass-card">
+          <div class="card-head"><span data-i18n="set.system">Hệ Thống</span></div>
+          <div class="card-content">
+            <div class="sys-grid">
+              <div class="sys-item"><span data-i18n="set.uptime">Uptime</span><b id="sysUptime">—</b></div>
+              <div class="sys-item"><span data-i18n="set.started">Bắt đầu</span><b id="sysStarted">—</b></div>
+              <div class="sys-item"><span data-i18n="set.mcVersion">Phiên bản MC</span><b id="sysMc">—</b></div>
+              <div class="sys-item"><span data-i18n="set.bank">Webhook ngân hàng</span><b id="sysBank">—</b></div>
+              <div class="sys-item"><span data-i18n="set.card">API thẻ cào</span><b id="sysCard">—</b></div>
+              <div class="sys-item"><span data-i18n="set.panelVer">Panel</span><b>v3.0 Nova</b></div>
+            </div>
+            <p class="hint"><span data-i18n="set.legacyHint">Giao diện panel cũ vẫn khả dụng tại</span> <a href="/legacy/index.html" target="_blank" rel="noopener" class="text-gradient">/legacy/index.html</a></p>
+          </div>
+        </div>
+
+        <div class="card glass-card">
+          <div class="card-head"><span data-i18n="set.about">Về Panel Này</span></div>
+          <div class="card-content">
+            <p class="about-p" data-i18n="set.aboutText">
+              Nova Panel v3 — giao diện mới phong cách superconscious (nền đen + neon cyan) cho
+              MC Bedrock Pay Bot. Giữ nguyên 100% chức năng panel cũ: tổng quan, cấu hình
+              giá/kho/server, điều khiển bot, đơn hàng, số dư, console realtime, webhook ngân
+              hàng & thẻ cào — và thêm trang Thống kê, tìm kiếm/lọc/xuất CSV, song ngữ VI/EN,
+              ⌘K palette, chế độ preview không cần bot.
+            </p>
+            <p class="hint"><span data-i18n="set.previewHint">Xem trước panel không cần chạy bot:</span> <code>node test/panel-preview.js</code> → http://localhost:3100</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ═══ COMMAND PALETTE (⌘K) ═══ -->
+  <div class="cmdk-mask" id="cmdk" style="display:none;">
+    <div class="cmdk-box glass-card glow-cyan">
+      <div class="cmdk-input-row">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <input type="text" id="cmdkInput" data-i18n-placeholder="cmdk.ph" placeholder="Gõ lệnh hoặc tìm trang…" autocomplete="off" />
+        <kbd>ESC</kbd>
+      </div>
+      <div class="cmdk-list" id="cmdkList"></div>
+    </div>
+  </div>
+
+  <!-- ═══ TOAST + LOGIN ═══ -->
+  <div class="toast" id="toast"></div>
+  <div class="key-mask" id="keyMask" style="display:none;">
+    <div class="key-box glass-card glow-cyan">
+      <div class="key-icon">
+        <svg viewBox="0 0 24 24" width="26" height="26" fill="none"><rect x="4.5" y="10.5" width="15" height="10" rx="3"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5" stroke-linecap="round" stroke-width="1.8" class="si-stroke"/><circle cx="12" cy="15.5" r="1.4" fill="currentColor"/></svg>
+      </div>
+      <h3 data-i18n="key.title">Nhập mật khẩu Panel</h3>
+      <p data-i18n="key.sub">Bot được cấu hình PANEL_PASSWORD trong .env</p>
+      <input type="password" id="keyInput" data-i18n-placeholder="key.ph" placeholder="Mật khẩu..." />
+      <p class="key-err" id="keyErr" style="display:none;" data-i18n="key.wrong">Sai mật khẩu — thử lại.</p>
+      <button class="btn btn-primary" id="keyBtn" data-i18n="key.enter">Vào Panel</button>
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/i18n.js"></script>
+  <script src="/charts.js"></script>
+  <script src="/app.js"></script>
+</body>
+</html>

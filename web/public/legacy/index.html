@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MC Bedrock Pay Bot — Legacy Panel</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <!-- ═══════════════ SIDEBAR ═══════════════ -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon">🟩</div>
+      <div class="brand-text">
+        <h1>Bedrock Bot</h1>
+        <span>Bảng Quản Trị</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a href="#" class="nav-item active" data-section="dashboard"><span class="nav-icon">📊</span><span>Tổng Quan</span></a>
+      <a href="#" class="nav-item" data-section="config"><span class="nav-icon">⚙️</span><span>Cấu Hình</span></a>
+      <a href="#" class="nav-item" data-section="orders"><span class="nav-icon">🧾</span><span>Đơn Hàng</span></a>
+      <a href="#" class="nav-item" data-section="balances"><span class="nav-icon">💳</span><span>Số Dư</span></a>
+      <a href="#" class="nav-item" data-section="console"><span class="nav-icon">🖥️</span><span>Console</span></a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="server-info">
+        <span class="server-dot" id="sideDot"></span>
+        <span id="sideServer">Chưa kết nối</span>
+      </div>
+      <div class="server-info muted">
+        <span>⛏</span><span id="sideVersion">Minecraft Bedrock</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ═══════════════ MAIN ═══════════════ -->
+  <div class="content">
+    <header class="topbar">
+      <div class="topbar-left"><h2 id="pageTitle">📊 Tổng Quan</h2></div>
+      <div class="topbar-right">
+        <div class="status-pills">
+          <div class="pill" id="pillMC"><span class="pill-dot"></span><span>Minecraft</span></div>
+          <div class="pill" id="pillDiscord"><span class="pill-dot"></span><span>Discord</span></div>
+          <div class="pill" id="pillShop"><span class="pill-dot"></span><span>Shop</span></div>
+        </div>
+      </div>
+    </header>
+
+    <!-- ═══════ DASHBOARD ═══════ -->
+    <section class="section active" id="section-dashboard">
+      <div class="stats-row">
+        <div class="stat-card stat-green">
+          <div class="stat-icon">🤖</div>
+          <div class="stat-info"><span class="stat-label">Bot Minecraft</span><span class="stat-value" id="dashBot">—</span></div>
+        </div>
+        <div class="stat-card stat-purple">
+          <div class="stat-icon">📦</div>
+          <div class="stat-info"><span class="stat-label">Kho Hàng</span><span class="stat-value" id="dashStock">—</span></div>
+        </div>
+        <div class="stat-card stat-blue">
+          <div class="stat-icon">🏷️</div>
+          <div class="stat-info"><span class="stat-label">Giá Hiện Tại</span><span class="stat-value" id="dashPrice">—</span></div>
+        </div>
+        <div class="stat-card stat-orange">
+          <div class="stat-icon">🧾</div>
+          <div class="stat-info"><span class="stat-label">Đơn Chờ</span><span class="stat-value" id="dashPending">—</span></div>
+        </div>
+      </div>
+
+      <div class="dashboard-grid">
+        <div class="card card-banner">
+          <div class="banner-content">
+            <h2 id="bannerTitle">🎮 Minecraft Bedrock Pay Bot</h2>
+            <p id="bannerSub">Bot /pay 24/7 + Shop tự động: Panel Discord, QR ngân hàng, thẻ cào, số dư cá nhân</p>
+            <div class="quick-actions">
+              <button class="btn btn-secondary" id="btnReconnect">🔄 Kết nối lại MC</button>
+              <button class="btn btn-danger" id="btnBotOff">🛑 Tắt bot mua</button>
+              <button class="btn btn-success" id="btnBotOn">🟢 Bật bot mua</button>
+              <button class="btn btn-primary" id="btnBalance">💰 Xem số dư bot</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card card-mini-console">
+          <div class="card-head"><span>🖥️ Console Nhanh</span><span class="badge-live">● LIVE</span></div>
+          <div class="mini-console" id="miniConsole"><p class="log-line log-system">Đang chờ log…</p></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><span>🧾 Đơn Hàng Gần Nhất</span><button class="btn btn-ghost btn-sm" id="btnRefreshOrders">🔄 Làm mới</button></div>
+        <div class="table-wrap">
+          <table class="data-table" id="ordersTableMini">
+            <thead><tr><th>Mã đơn</th><th>Người mua</th><th>IGN</th><th>Tiền game</th><th>VNĐ</th><th>Phương thức</th><th>Trạng thái</th></tr></thead>
+            <tbody><tr><td colspan="7" class="empty">Chưa có đơn hàng</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════ CONFIG ═══════ -->
+    <section class="section" id="section-config">
+      <div class="config-grid">
+        <div class="card">
+          <div class="card-head"><span>🏷️ Cấu Hình Giá</span></div>
+          <div class="card-content">
+            <form id="priceForm">
+              <div class="form-field">
+                <label for="baseAmount">Số tiền game gốc</label>
+                <div class="input-wrapper"><input type="text" id="baseAmount" placeholder="1000000" /><span class="input-suffix">💎</span></div>
+              </div>
+              <div class="form-row">
+                <div class="form-field">
+                  <label for="basePrice">Giá bán</label>
+                  <div class="input-wrapper"><input type="text" id="basePrice" placeholder="10000" /><span class="input-suffix">💵</span></div>
+                </div>
+                <div class="form-field">
+                  <label for="currency">Đơn vị</label>
+                  <div class="input-wrapper"><input type="text" id="currency" placeholder="VND" /><span class="input-suffix">🏦</span></div>
+                </div>
+              </div>
+              <div class="price-display" id="pricePreview">—</div>
+              <button type="submit" class="btn btn-primary">💾 Cập Nhật Giá</button>
+            </form>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><span>📦 Kho Hàng</span></div>
+          <div class="card-content">
+            <div class="stock-hero">
+              <div class="stock-ring"><span class="stock-number" id="stockDisplay">0</span></div>
+              <span class="stock-subtitle">tiền game có sẵn</span>
+            </div>
+            <form id="stockForm" class="stock-form">
+              <div class="input-wrapper">
+                <input type="text" id="stockInput" placeholder="Nhập mới hoặc +50m / -20m (VD: 1b)" />
+                <span class="input-suffix">📦</span>
+              </div>
+              <button type="submit" class="btn btn-secondary">📦 Cập Nhật Kho</button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <div class="config-grid" style="margin-top:1rem;">
+        <div class="card">
+          <div class="card-head"><span>🌐 Server Minecraft Bedrock</span></div>
+          <div class="card-content">
+            <form id="serverForm">
+              <div class="form-row">
+                <div class="form-field" style="flex:2;">
+                  <label for="serverHost">IP / Domain</label>
+                  <div class="input-wrapper"><input type="text" id="serverHost" placeholder="vd: play.example.net" /><span class="input-suffix">🌐</span></div>
+                </div>
+                <div class="form-field">
+                  <label for="serverPort">Port</label>
+                  <div class="input-wrapper"><input type="text" id="serverPort" placeholder="19132" /><span class="input-suffix">🔌</span></div>
+                </div>
+              </div>
+              <div class="price-display" id="serverPreview">—</div>
+              <button type="submit" class="btn btn-primary">🌐 Đổi Server (ping trước khi vào)</button>
+            </form>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><span>🤖 Điều Khiển Bot</span></div>
+          <div class="card-content">
+            <div class="ctrl-status" id="ctrlStatus">—</div>
+            <div class="quick-actions" style="margin-top:1rem;">
+              <button class="btn btn-secondary" id="btnReconnect2">🔄 Kết nối lại</button>
+              <button class="btn btn-danger" id="btnBotOff2">🛑 botoff</button>
+              <button class="btn btn-success" id="btnBotOn2">🟢 onbot</button>
+            </div>
+            <p class="hint">botoff = bot out server + khóa nút Mua trên Panel Discord. onbot = vào lại server.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════ ORDERS ═══════ -->
+    <section class="section" id="section-orders">
+      <div class="card card-full">
+        <div class="card-head">
+          <span>🧾 Tất Cả Đơn Hàng (50 gần nhất)</span>
+          <button class="btn btn-ghost btn-sm" id="btnRefreshOrders2">🔄 Làm mới</button>
+        </div>
+        <div class="table-wrap">
+          <table class="data-table" id="ordersTable">
+            <thead><tr><th>Mã đơn</th><th>Thời gian</th><th>Người mua</th><th>IGN</th><th>Tiền game</th><th>VNĐ</th><th>Phương thức</th><th>Trạng thái</th></tr></thead>
+            <tbody><tr><td colspan="8" class="empty">Chưa có đơn hàng</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════ BALANCES ═══════ -->
+    <section class="section" id="section-balances">
+      <div class="config-grid">
+        <div class="card">
+          <div class="card-head"><span>💳 Số Dư Thành Viên</span></div>
+          <div class="table-wrap">
+            <table class="data-table" id="balancesTable">
+              <thead><tr><th>Discord User ID</th><th>Số dư (VNĐ)</th></tr></thead>
+              <tbody><tr><td colspan="2" class="empty">Chưa có ai nạp</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-head"><span>➕ Cộng / Trừ Số Dư</span></div>
+          <div class="card-content">
+            <form id="balanceForm">
+              <div class="form-field">
+                <label for="balUserId">Discord User ID</label>
+                <div class="input-wrapper"><input type="text" id="balUserId" placeholder="123456789012345678" /><span class="input-suffix">🆔</span></div>
+              </div>
+              <div class="form-field">
+                <label for="balAmount">Số tiền VNĐ</label>
+                <div class="input-wrapper"><input type="text" id="balAmount" placeholder="50000 hoặc 50k" /><span class="input-suffix">💵</span></div>
+              </div>
+              <div class="quick-actions">
+                <button type="button" class="btn btn-success" id="btnBalAdd">➕ Cộng</button>
+                <button type="button" class="btn btn-danger" id="btnBalDeduct">➖ Trừ</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+      <div class="card" style="margin-top:1rem;">
+        <div class="card-head"><span>📜 Lịch Sử Biến Động</span></div>
+        <div class="table-wrap">
+          <table class="data-table" id="historyTable">
+            <thead><tr><th>Thời gian</th><th>User</th><th>Loại</th><th>Số tiền</th><th>Lý do</th></tr></thead>
+            <tbody><tr><td colspan="5" class="empty">Chưa có lịch sử</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════ CONSOLE ═══════ -->
+    <section class="section" id="section-console">
+      <div class="card card-full">
+        <div class="card-head">
+          <div class="console-title-bar"><span>🖥️ Live Console</span><span class="badge-live">● LIVE</span></div>
+          <div style="display:flex;gap:.5rem;">
+            <label class="toggle"><input type="checkbox" id="onlyChat" /> Chỉ hiện chat in-game</label>
+            <button id="clearConsole" class="btn btn-ghost btn-sm">🗑️ Xóa</button>
+          </div>
+        </div>
+        <div class="console-body" id="console"><p class="log-line log-system">Đang chờ log…</p></div>
+        <div style="border-top:1px solid var(--border);padding:1rem 1.25rem;background:rgba(255,255,255,0.02);">
+          <form id="chatForm" style="display:flex;gap:.5rem;">
+            <input type="text" id="chatInput" placeholder="Gõ lệnh (vd: /spawn) hoặc tin nhắn chat vào game..." style="flex:1;" autocomplete="off" />
+            <button type="submit" class="btn btn-primary" style="width:auto;padding:0 1.5rem;">Gửi</button>
+          </form>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ═══ TOAST + LOGIN ═══ -->
+  <div class="toast" id="toast"></div>
+  <div class="key-mask" id="keyMask" style="display:none;">
+    <div class="key-box">
+      <h3>🔒 Nhập mật khẩu Panel</h3>
+      <p>Bot được cấu hình PANEL_PASSWORD trong .env</p>
+      <input type="password" id="keyInput" placeholder="Mật khẩu..." />
+      <button class="btn btn-primary" id="keyBtn">Vào Panel</button>
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
