@@ -11,11 +11,18 @@ const { WebhookClient, AttachmentBuilder } = require('discord.js');
 const log = (...args) => console.log(`[${new Date().toLocaleString('vi-VN', { hour12: false })}] [Webhook]`, ...args);
 const warn = (...args) => console.warn(`[${new Date().toLocaleString('vi-VN', { hour12: false })}] [Webhook]`, ...args);
 
-/** Tạo WebhookClient từ URL trong config (trả null nếu URL không hợp lệ/thiếu) */
+let cachedWebhook = null;
+let cachedUrl = '';
+
+/** Tạo WebhookClient từ URL trong config hoặc .env (trả null nếu URL không hợp lệ/thiếu) */
 function getWebhook(config) {
-  if (!config.adminWebhookUrl) return null;
+  const url = (config && config.adminWebhookUrl) || process.env.ADMIN_WEBHOOK_URL || '';
+  if (!url) return null;
+  if (cachedWebhook && cachedUrl === url) return cachedWebhook;
   try {
-    return new WebhookClient({ url: config.adminWebhookUrl });
+    cachedWebhook = new WebhookClient({ url });
+    cachedUrl = url;
+    return cachedWebhook;
   } catch (err) {
     warn(`URL webhook không hợp lệ: ${err.message}`);
     return null;
@@ -49,9 +56,13 @@ async function notifyScreenshot(config, buffer, caption) {
     return false;
   }
   try {
+    if (!Buffer.isBuffer(buffer) || buffer.length < 100) {
+      warn(`Buffer ảnh không hợp lệ: type=${typeof buffer}, length=${buffer?.length ?? 0}`);
+      return false;
+    }
     const file = new AttachmentBuilder(buffer, { name: `pay-${Date.now()}.png` });
     await webhook.send({ content: caption, files: [file], username: 'MC Pay Bot', allowedMentions: { parse: [] } });
-    log('Đã gửi ảnh chụp tới webhook admin.');
+    log(`Đã gửi ảnh chụp tới webhook admin (${buffer.length} bytes).`);
     return true;
   } catch (err) {
     warn(`Gửi ảnh tới webhook thất bại: ${err.message}`);

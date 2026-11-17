@@ -69,14 +69,20 @@ function webLog(ctx, msg) {
 async function notifyAdmin(ctx, embed, shotBuffer = null) {
   try {
     const { notifyText, notifyScreenshot } = require('../webhook');
-    if (shotBuffer) {
-      const parts = [`📋 **${embed.title}**`, ...embed.fields.map((f) => `• ${f.name}: ${String(f.value).replace(/`/g, '')}`)];
-      await notifyScreenshot(ctx.config, shotBuffer, parts.join('\n').slice(0, 1900));
-      return;
+    const fields = Array.isArray(embed?.fields) ? embed.fields : [];
+    const parts = [`📋 **${embed?.title || 'Thông báo Admin'}**`, ...fields.map((f) => `• ${f.name}: ${String(f.value).replace(/`/g, '')}`)];
+    const caption = parts.join('\n').slice(0, 1900);
+    const cfg = ctx?.config || {};
+    if (shotBuffer && Buffer.isBuffer(shotBuffer) && shotBuffer.length > 100) {
+      const sent = await notifyScreenshot(cfg, shotBuffer, caption);
+      if (sent) return;
+      // Gửi ảnh thất bại → fallback gửi text
+      console.warn('[Shop] notifyAdmin: gửi ảnh webhook thất bại, fallback gửi text.');
     }
-    const parts = [`📋 **${embed.title}**`, ...embed.fields.map((f) => `• ${f.name}: ${String(f.value).replace(/`/g, '')}`)];
-    await notifyText(ctx.config, parts.join('\n').slice(0, 1900));
-  } catch {}
+    await notifyText(cfg, caption);
+  } catch (err) {
+    console.warn(`[Shop] notifyAdmin lỗi: ${err.message}`);
+  }
 }
 
 /** DM cho người mua (im lặng nếu không DM được) */
@@ -210,8 +216,11 @@ async function completeBankOrder(ctx, order, info = {}) {
       ign,
       amount: formatStock(gameMoney),
     });
-    if (shotBuffer) {
+    if (shotBuffer && Buffer.isBuffer(shotBuffer)) {
       shotFile = new AttachmentBuilder(shotBuffer, { name: fileName });
+      console.log(`[Shop] Render pay proof OK: ${shotBuffer.length} bytes cho đơn ${orderId}`);
+    } else {
+      console.warn(`[Shop] Render pay proof trả về ${typeof shotBuffer} cho đơn ${orderId}`);
     }
   } catch (err) {
     console.warn(`[Shop] Render pay proof lỗi: ${err.message}`);

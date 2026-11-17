@@ -567,8 +567,11 @@ async function executeBalancePurchase(ctx, interaction, vnd, ign) {
         ign,
         amount: formatStock(gameMoney),
       });
-      if (shotBuffer) {
+      if (shotBuffer && Buffer.isBuffer(shotBuffer)) {
         shotFile = new AttachmentBuilder(shotBuffer, { name: fileName });
+        console.log(`[Shop] Render pay proof (balance) OK: ${shotBuffer.length} bytes`);
+      } else {
+        console.warn(`[Shop] Render pay proof (balance) trả về ${typeof shotBuffer}`);
       }
     } catch (err) {
       console.warn(`[Shop] Render pay proof lỗi: ${err.message}`);
