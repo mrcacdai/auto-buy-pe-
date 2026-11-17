@@ -18,6 +18,7 @@ const { formatNumber } = require('./format');
 const DEFAULT_API_BASE = 'https://api.bytemart.io.vn/historyapimbbank';
 const DEFAULT_INTERVAL_SEC = 30;
 const MIN_INTERVAL_SEC = 10;
+const DEFAULT_TIMEOUT_MS = 30000; // 30s timeout để tránh lỗi khi MBBank/ByteMart phản hồi chậm lúc cao điểm
 
 let pollTimer = null;
 let isPolling = false;
@@ -54,8 +55,11 @@ async function fetchTransactions(token, apiBase = DEFAULT_API_BASE) {
   }
 
   const endpoint = `${apiBase.replace(/\/+$/, '')}/${encodeURIComponent(cleanToken)}`;
+  const timeoutMs = parseInt(process.env.MBBANK_TIMEOUT_MS || process.env.MBBANK_TIMEOUT, 10) || DEFAULT_TIMEOUT_MS;
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 15000);
+  const timeoutId = setTimeout(() => {
+    controller.abort(new Error(`Quá thời gian phản hồi từ API ByteMart/MBBank (${Math.round(timeoutMs / 1000)}s timeout)`));
+  }, timeoutMs);
 
   try {
     const res = await fetch(endpoint, {
@@ -113,6 +117,12 @@ async function fetchTransactions(token, apiBase = DEFAULT_API_BASE) {
     return validCredits;
   } catch (err) {
     clearTimeout(timeoutId);
+    if (err.name === 'AbortError' || controller.signal.aborted) {
+      if (controller.signal.reason instanceof Error) {
+        throw controller.signal.reason;
+      }
+      throw new Error(`Quá thời gian kết nối API ByteMart/MBBank (${Math.round(timeoutMs / 1000)}s timeout)`);
+    }
     throw err;
   }
 }
@@ -132,11 +142,18 @@ async function pollOnce(ctx, io) {
     return 0;
   }
 
+  const hadErrorsBefore = consecutiveErrors > 0;
+
   try {
     const transactions = await fetchTransactions(token, apiBase);
     lastSuccessTime = new Date().toISOString();
     consecutiveErrors = 0;
     lastError = null;
+
+    if (hadErrorsBefore && ctx) {
+      console.log('[MBBank/ByteMart] 🟢 Kết nối API MBBank đã phục hồi bình thường.');
+      webLog(ctx, '🟢 Kết nối API MBBank (ByteMart) đã phục hồi bình thường.');
+    }
 
     if (transactions.length > 0) {
       const { processTransactions } = require('../../web/routes/bank');
@@ -148,16 +165,22 @@ async function pollOnce(ctx, io) {
     return transactions.length;
   } catch (err) {
     consecutiveErrors += 1;
-    lastError = err.message;
+    let friendlyMsg = err.message;
+    if (err.name === 'AbortError' || String(err.message).toLowerCase().includes('aborted')) {
+      friendlyMsg = 'Quá thời gian chờ phản hồi từ API ByteMart/MBBank (Timeout) — bot sẽ tự thử lại ở lần quét kế tiếp.';
+    }
+    lastError = friendlyMsg;
     const now = Date.now();
 
-    // Giảm tần suất ghi log lỗi (tránh spam console mỗi 30s khi mất mạng)
-    if (now - lastErrorTime > 5 * 60 * 1000 || consecutiveErrors === 1) {
+    // Lỗi cấu hình (sai token / bị từ chối) -> thông báo ngay
+    // Lỗi mạng / timeout -> chỉ thông báo lên webLog khi lặp lại liên tiếp >= 2 lần hoặc cách nhau > 5 phút
+    const isConfigError = String(err.message).includes('từ chối') || String(err.message).includes('token');
+    const shouldLogWeb = isConfigError || consecutiveErrors >= 2 || (now - lastErrorTime > 5 * 60 * 1000);
+
+    console.warn(`[MBBank/ByteMart] ⚠️ Lỗi quét lịch sử (lần ${consecutiveErrors}): ${friendlyMsg}`);
+    if (shouldLogWeb && ctx && now - lastErrorTime > 60 * 1000) {
       lastErrorTime = now;
-      console.warn(`[MBBank/ByteMart] ⚠️ Lỗi quét lịch sử: ${err.message}`);
-      if (ctx) {
-        webLog(ctx, `⚠️ Lỗi quét lịch sử MBBank: ${err.message}`);
-      }
+      webLog(ctx, `⚠️ Lỗi quét lịch sử MBBank: ${friendlyMsg}`);
     }
     return 0;
   } finally {
