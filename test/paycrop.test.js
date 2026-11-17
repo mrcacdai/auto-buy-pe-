@@ -4,41 +4,44 @@ const assert = require('assert');
 const { renderPayCropScreenshot, extractPayResponseLine, stripTaxInfo } = require('../src/screenshot/payCropRender');
 
 (async () => {
-  console.log('--- Test stripTaxInfo (xóa tax) ---');
-  assert.strictEqual(stripTaxInfo('You paid hoffi116 $ 2M (+$ 40k tax)'), 'You paid hoffi116 $ 2M');
-  assert.strictEqual(stripTaxInfo('You paid hoffi116 $ 2M (+ 40K tax)'), 'You paid hoffi116 $ 2M');
-  assert.strictEqual(stripTaxInfo('§fYou paid §ehoffi116 §a$ 2M §7(+§a$ 40k§7 tax)'), '§fYou paid §ehoffi116 §a$ 2M');
-  assert.strictEqual(stripTaxInfo('You paid steve $ 10M (+ $ 500k tax)'), 'You paid steve $ 10M');
-  assert.strictEqual(stripTaxInfo('You paid notch $ 1M'), 'You paid notch $ 1M');
-  console.log('✓ stripTaxInfo: loại bỏ hoàn toàn (+ 40k tax) khỏi mọi định dạng chuỗi');
-
-  console.log('\n--- Test extractPayResponseLine ---');
-
-  // Test 1: extract with lines containing 'paid'
+  console.log('--- Test extractPayResponseLine (giữ nguyên toàn bộ phản hồi server) ---');
   const lines1 = [
-    { kind: 'cmd', text: '/pay hoffi116 2000000' },
-    { kind: 'chat', text: 'You paid hoffi116 $ 2M (+$ 40k tax)', raw: '§fYou paid §ehoffi116 §a$ 2M §7(+§a$ 40k§7 tax)' },
+    { kind: 'cmd', text: '/pay evil149 10000' },
+    { kind: 'chat', text: 'You paid evil149 $ 10K (+$ 200 tax)', raw: '§fYou paid §eevil149 §a$ §f10K §7(+§a$ §7200 tax)' },
   ];
-  const r1 = extractPayResponseLine(lines1, 'hoffi116', '2M');
-  assert.ok(r1.includes('hoffi116'), 'Phải tìm thấy dòng chứa hoffi116');
-  assert.strictEqual(r1.toLowerCase().includes('tax'), false, 'Phải xóa bỏ (+ 40k tax)');
-  console.log('✓ extractPayResponseLine: tìm thấy dòng chat phản hồi');
+  const r1 = extractPayResponseLine(lines1, 'evil149', '10K');
+  assert.ok(r1.includes('evil149'), 'Phải tìm thấy dòng chứa evil149');
+  assert.ok(r1.includes('200 tax'), 'Phải giữ nguyên toàn bộ chữ server trả về kể cả (+ 200 tax)');
+  console.log('✓ extractPayResponseLine: trích xuất đúng dòng phản hồi kèm đầy đủ thông tin thuế');
 
-  // Test 2: empty lines fallback
   const r2 = extractPayResponseLine([], 'steve', '5m');
   assert.strictEqual(r2, 'You paid steve $ 5m');
   console.log('✓ extractPayResponseLine: fallback khi server không có phản hồi');
 
-  console.log('\n--- Test renderPayCropScreenshot ---');
-  const buffer1 = await renderPayCropScreenshot({ lines: lines1, ign: 'hoffi116', amount: '2M' });
-  assert.ok(Buffer.isBuffer(buffer1), 'Kết quả phải là Buffer');
-  assert.ok(buffer1.length > 5000, 'Ảnh PNG phải có dung lượng > 5KB');
-  // Check PNG magic bytes: 0x89 0x50 0x4E 0x47
-  assert.strictEqual(buffer1[0], 0x89);
-  assert.strictEqual(buffer1[1], 0x50);
-  assert.strictEqual(buffer1[2], 0x4e);
-  assert.strictEqual(buffer1[3], 0x47);
-  console.log('✓ renderPayCropScreenshot: render PNG hợp lệ từ phản hồi server (size: ' + buffer1.length + ' bytes)');
+  console.log('\n--- Test stripTaxInfo (tiện ích phụ trợ) ---');
+  assert.strictEqual(stripTaxInfo('You paid hoffi116 $ 2M (+$ 40k tax)'), 'You paid hoffi116 $ 2M');
+  assert.strictEqual(stripTaxInfo('You paid evil149 $ 10K (+$ 200 tax)'), 'You paid evil149 $ 10K');
+  console.log('✓ stripTaxInfo: hoạt động chính xác khi cần lọc');
+
+  console.log('\n--- Test renderPayCropScreenshot (in đầy đủ chữ lên background sạch) ---');
+  // Test với ví dụ cụ thể của user: You paid evil149 $ 10K (+$ 200 tax)
+  const bufferEvil = await renderPayCropScreenshot({
+    text: 'You paid evil149 $ 10K (+$ 200 tax)',
+    ign: 'evil149',
+    amount: '10K',
+  });
+  assert.ok(Buffer.isBuffer(bufferEvil), 'Kết quả phải là Buffer');
+  assert.ok(bufferEvil.length > 5000, 'Ảnh PNG phải có dung lượng > 5KB');
+  assert.strictEqual(bufferEvil[0], 0x89);
+  assert.strictEqual(bufferEvil[1], 0x50);
+  assert.strictEqual(bufferEvil[2], 0x4e);
+  assert.strictEqual(bufferEvil[3], 0x47);
+  console.log('✓ renderPayCropScreenshot: render thành công ví dụ "You paid evil149 $ 10K (+$ 200 tax)" (size: ' + bufferEvil.length + ' bytes)');
+
+  const bufferFromLines = await renderPayCropScreenshot({ lines: lines1, ign: 'evil149', amount: '10K' });
+  assert.ok(Buffer.isBuffer(bufferFromLines));
+  assert.strictEqual(bufferFromLines[0], 0x89);
+  console.log('✓ renderPayCropScreenshot: render thành công từ mảng lines server');
 
   const bufferFallback = await renderPayCropScreenshot({ lines: [], ign: 'player123', amount: '10M' });
   assert.ok(Buffer.isBuffer(bufferFallback));

@@ -69,9 +69,12 @@ const COLOR_MAP = {
 
 /**
  * Tách chuỗi thành các đoạn kèm màu sắc (hỗ trợ mã màu § và & của Minecraft).
- * Nếu không có mã màu, tự động bôi xanh ký hiệu $ giống server Minecraft.
+ * Nếu không có mã màu, tự động bôi xanh ký hiệu $ và tô xám thông tin thuế (...) giống server Minecraft.
  */
 function parseSegments(rawText) {
+  if (!rawText) return [];
+
+  // Trường hợp chuỗi có sẵn mã màu § hoặc &
   if (/[§&][0-9a-fk-or]/i.test(rawText)) {
     const segs = [];
     let curColor = '#ffffff';
@@ -88,33 +91,44 @@ function parseSegments(rawText) {
     return segs;
   }
 
-  // Tự động phân tách: chữ thường trắng, $ xanh lá #55ff55
+  // Phân tách chuỗi thô:
+  // - Nội dung thông thường màu trắng (#ffffff)
+  // - Ký hiệu tiền tệ $ màu xanh lá (#55ff55)
+  // - Phần thuế trong ngoặc (...) màu xám (#aaaaaa - §7), với ký hiệu $ bên trong vẫn màu xanh lá
   const segs = [];
-  const parts = rawText.split(/(\$)/g);
-  for (const p of parts) {
-    if (!p) continue;
-    if (p === '$') segs.push({ text: '$', color: '#55ff55' });
-    else segs.push({ text: p, color: '#ffffff' });
+  const parenParts = rawText.split(/(\([^)]+\))/g);
+  for (const part of parenParts) {
+    if (!part) continue;
+    const isTax = /^\(.*\b(?:tax|thuế|\+).*\)$/i.test(part) || (/^\(/.test(part) && /\)$/.test(part));
+    const defaultColor = isTax ? '#aaaaaa' : '#ffffff';
+
+    const subParts = part.split(/(\$)/g);
+    for (const sub of subParts) {
+      if (!sub) continue;
+      if (sub === '$') {
+        segs.push({ text: '$', color: '#55ff55' });
+      } else {
+        segs.push({ text: sub, color: defaultColor });
+      }
+    }
   }
+
   return segs;
 }
 
 /**
- * Loại bỏ phần thông tin thuế (tax) nếu có trong câu thông báo server,
- * ví dụ: "(+$ 40k tax)", "(+ 40k tax)", "(+ 40,000 tax)", "(tax...)", "(thuế...)"
+ * Loại bỏ phần thông tin thuế (tax) nếu cần thiết (giữ lại làm tiện ích hỗ trợ).
  */
 function stripTaxInfo(text) {
   if (!text) return '';
   return String(text)
-    // Bỏ ngoặc chứa tax / thuế bất kể thứ tự
     .replace(/\s*(?:[§&][0-9a-fk-or])*\s*\([^)]*(?:tax|thuế)[^)]*\)/gi, '')
-    // Bỏ mã màu thừa ở cuối chuỗi nếu có
     .replace(/(?:[§&][0-9a-fk-or])+\s*$/gi, '')
     .trim();
 }
 
 /**
- * Tìm dòng phản hồi hợp lý nhất từ mảng phản hồi in-game của server
+ * Tìm dòng phản hồi hợp lý nhất từ mảng phản hồi in-game của server (giữ nguyên đầy đủ text)
  */
 function extractPayResponseLine(lines, ign = '', amount = '') {
   if (!Array.isArray(lines) || lines.length === 0) {
@@ -133,20 +147,21 @@ function extractPayResponseLine(lines, ign = '', amount = '') {
   for (const line of nonCmd) {
     const textLower = String(line.text || '').toLowerCase();
     if (keywords.some((k) => textLower.includes(k)) || (ignLower && textLower.includes(ignLower))) {
-      return stripTaxInfo(line.raw || line.text);
+      return (line.raw || line.text).trim();
     }
   }
 
   // Dòng ok hoặc chat cuối cùng
   const lastOkOrChat = [...nonCmd].reverse().find((l) => l.kind === 'ok' || l.kind === 'chat');
-  if (lastOkOrChat) return stripTaxInfo(lastOkOrChat.raw || lastOkOrChat.text);
+  if (lastOkOrChat) return (lastOkOrChat.raw || lastOkOrChat.text).trim();
 
   const lastLine = nonCmd[nonCmd.length - 1];
-  return stripTaxInfo(lastLine.raw || lastLine.text || `You paid ${ign} $ ${amount || ''}`.trim());
+  return (lastLine.raw || lastLine.text || `You paid ${ign} $ ${amount || ''}`).trim();
 }
 
 /**
  * Render ảnh xác nhận /pay trên background Minecraft đã tách chữ.
+ * In đầy đủ toàn bộ chữ server trả về (kèm tiền, thuế, tên...).
  * @param {object} p
  * @param {Array<{kind: string, text: string, raw?: string}>} [p.lines] Các dòng phản hồi in-game
  * @param {string} [p.text] Chuỗi phản hồi cần render (nếu chỉ định trực tiếp)
@@ -157,8 +172,7 @@ function extractPayResponseLine(lines, ign = '', amount = '') {
 async function renderPayCropScreenshot({ lines = [], text = '', ign = '', amount = '' } = {}) {
   ensureFont();
 
-  const rawDisplay = (text || extractPayResponseLine(lines, ign, amount)).trim();
-  const displayText = stripTaxInfo(rawDisplay);
+  const displayText = (text || extractPayResponseLine(lines, ign, amount)).trim();
   const bg = await getBackground();
 
   const fontName = fontRegistered ? 'MinecraftPay' : 'Courier New, monospace';

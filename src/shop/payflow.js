@@ -171,13 +171,12 @@ async function completeBankOrder(ctx, order, info = {}) {
   }
 
   /* ---------- Thành công ---------- */
-  const { stripTaxInfo } = require('../screenshot');
   const paidLine = (result.lines ?? []).find((l) => l.kind === 'ok') || (result.lines ?? []).find((l) => l.kind === 'chat');
-  const cleanPaidText = paidLine ? stripTaxInfo(paidLine.text) : 'đã gửi lệnh';
+  const paidConfirmText = paidLine ? (paidLine.text || paidLine.raw || '').trim() : 'đã gửi lệnh';
   orders.updateOrderStatus(orderId, 'COMPLETED', {
     completedAt: new Date().toISOString(),
     bankTxId: info.txId ?? null,
-    paidInfo: cleanPaidText.slice(0, 200),
+    paidInfo: paidConfirmText.slice(0, 200),
     receivedAmount: info.receivedAmount ?? null,
   });
   if (info.txId) orders.markProcessedTx(info.txId);
@@ -229,7 +228,7 @@ async function completeBankOrder(ctx, order, info = {}) {
         `💰 **Số tiền nhận:** \`${formatStock(gameMoney)}\` (${formatNumber(Number(gameMoney))} in-game)`,
         `🎮 **IGN nhận:** \`${ign}\``,
         `🤖 **Lệnh đã chạy:** \`/pay ${ign} ${formatStock(gameMoney)}\``,
-        paidLine ? `🖥️ **Server xác nhận:** \`${cleanPaidText.slice(0, 120)}\`` : '',
+        paidLine ? `🖥️ **Server xác nhận:** \`${paidConfirmText.slice(0, 120)}\`` : '',
         '',
         `*Chúc bạn chơi game vui vẻ! Có vấn đề gì hãy liên hệ quản trị viên.*`,
       ]
