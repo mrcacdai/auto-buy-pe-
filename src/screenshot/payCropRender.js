@@ -176,7 +176,7 @@ async function renderPayCropScreenshot({ lines = [], text = '', ign = '', amount
   const bg = await getBackground();
 
   const fontName = fontRegistered ? 'MinecraftPay' : 'Courier New, monospace';
-  const fontSize = 18;
+  const fontSize = 25; // Tăng 40% kích thước chữ (từ 18px lên 25px) để dễ nhìn hơn
 
   // Đo chiều rộng chữ cần vẽ
   const measureCanvas = createCanvas(10, 10);
@@ -190,7 +190,7 @@ async function renderPayCropScreenshot({ lines = [], text = '', ign = '', amount
   }
 
   const startX = 17;
-  const startY = 17;
+  const startY = 15; // Căn giữa hoàn hảo theo chiều dọc với chiều cao nền 56px
   const bgBaseW = bg ? bg.width : 493;
   const bgBaseH = bg ? bg.height : 56;
   const targetW = Math.max(bgBaseW, Math.ceil(startX + textWidth + 30));
