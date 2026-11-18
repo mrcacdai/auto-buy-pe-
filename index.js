@@ -22,7 +22,7 @@
 const { Client, GatewayIntentBits, Events, EmbedBuilder } = require('discord.js');
 
 const { config, validateConfig } = require('./src/config');
-const { BedrockManager } = require('./src/minecraft');
+const { JavaManager } = require('./src/minecraft');
 const { buildCommandJson, handlePay, handleBalance, handleSetIp } = require('./src/commands');
 const { notifyText } = require('./src/webhook');
 
@@ -60,12 +60,12 @@ if (configErrors.length > 0) {
 
 /* ---------------- 2. Tạo manager Minecraft ---------------- */
 
-const manager = new BedrockManager(config);
+const manager = new JavaManager(config);
 
 manager.on('spawn', () => {
   const info = manager.stateInfo();
-  log(`Minecraft online: ${info.username} @ ${info.server} (Bedrock ${manager.detected.version ?? 'auto'})`);
-  notifyText(config, `✅ Bot \`${info.username}\` đã vào server Bedrock **${info.server}** (${manager.detected.version ?? 'auto'}).`);
+  log(`Minecraft online: ${info.username} @ ${info.server} (Java ${manager.detected.version ?? 'auto'})`);
+  notifyText(config, `✅ Bot \`${info.username}\` đã vào server Minecraft PC (Java) **${info.server}** (${manager.detected.version ?? 'auto'}).`);
 });
 
 manager.on('kick', (reason) => {

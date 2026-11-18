@@ -179,7 +179,7 @@
 
       // Sidebar
       $('sideServer').textContent = st.server ?? t('side.notConnected');
-      $('sideVersion').textContent = st.detected?.version ? `Bedrock ${st.detected.version}` : 'Minecraft Bedrock';
+      $('sideVersion').textContent = st.detected?.version ? `Java ${st.detected.version}` : 'Minecraft PC (Java)';
       const dot = $('sideDot');
       dot.className = `server-dot ${st.mcState === 'online' ? 'online' : connecting ? 'connecting' : ''}`;
       $('sideUptime').textContent = fmtUptime(st.uptimeSec);
@@ -225,7 +225,7 @@
     if (!st) return;
     $('sysUptime').textContent = fmtUptime(st.uptimeSec);
     $('sysStarted').textContent = st.startedAt ? fmtDateTime(st.startedAt) : '—';
-    $('sysMc').textContent = st.detected?.version ? `Bedrock ${st.detected.version}` : 'auto';
+    $('sysMc').textContent = st.detected?.version ? `Java ${st.detected.version}` : 'auto';
     setSysOk('sysBank', !!st.bankConfigured);
     setSysOk('sysCard', !!st.cardConfigured);
   }
@@ -287,7 +287,7 @@
   $('serverForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     const host = $('serverHost').value.trim();
-    const port = $('serverPort').value.trim() || 19132;
+    const port = $('serverPort').value.trim() || 25565;
     if (!host) return toast(t('toasts.enterHost'), 'err');
     try {
       const res = await api('/api/server', { method: 'POST', body: JSON.stringify({ host, port }) });

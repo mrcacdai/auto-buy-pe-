@@ -43,21 +43,12 @@ async function sendToGame(ctx, text) {
     return ctx.manager._queueInGameCommand(text);
   }
 
-  // Chat thường -> gửi packet text trực tiếp (như người chơi gõ chat)
-  const client = ctx.manager.client;
-  try {
-    client.write('text', {
-      type: 'chat',
-      needs_translation: false,
-      source_name: ctx.manager.config.username,
-      message: text,
-      filtered_message: '',
-    });
-    return [{ kind: 'cmd', text: text }];
-  } catch (err) {
-    // Server không nhận packet chat -> dùng /say dự phòng
-    return ctx.manager._queueInGameCommand(`/say ${text}`);
+  // Chat thường -> gửi trực tiếp qua mineflayer (MC PC / Java)
+  if (typeof ctx.manager.sendChat === 'function') {
+    return ctx.manager.sendChat(text);
   }
+
+  return ctx.manager._queueInGameCommand(`/say ${text}`);
 }
 
 /* ------------------------------------------------------------------ */

@@ -69,16 +69,16 @@ const balanceCommand = new SlashCommandBuilder()
 
 const setIpCommand = new SlashCommandBuilder()
   .setName('setipserver')
-  .setDescription('Đổi máy chủ Minecraft Bedrock mà bot sẽ online (chỉ admin)')
+  .setDescription('Đổi máy chủ Minecraft PC (Java) mà bot sẽ online (chỉ admin)')
   .addStringOption((opt) =>
     opt
       .setName('ip')
-      .setDescription('IP hoặc domain của server Bedrock (vd: play.example.net)')
+      .setDescription('IP hoặc domain của server Minecraft Java (vd: donutsmp.net)')
       .setRequired(true)
       .setMaxLength(200)
   )
   .addIntegerOption((opt) =>
-    opt.setName('port').setDescription('Cổng server (mặc định 19132)').setMinValue(1).setMaxValue(65535)
+    opt.setName('port').setDescription('Cổng server (mặc định 25565)').setMinValue(1).setMaxValue(65535)
   );
 
 /** JSON payload để đăng ký lên Discord */
@@ -165,7 +165,7 @@ async function handlePay(interaction, manager, config) {
     const embed = new EmbedBuilder()
       .setColor(COLOR_OK)
       .setTitle('💸 Lệnh /pay đã được gửi trong game')
-      .setDescription(`Bot đã thực hiện lệnh tại **${info.server}** (Bedrock ${manager.detected.version ?? 'auto'})`)
+      .setDescription(`Bot đã thực hiện lệnh tại **${info.server}** (Java ${manager.detected.version ?? 'auto'})`)
       .addFields(
         { name: '👤 Người nhận (IGN)', value: `\`${ignResult.ign}\``, inline: true },
         { name: '💰 Số tiền', value: `\`${amountResult.display}\``, inline: true },
@@ -183,7 +183,7 @@ async function handlePay(interaction, manager, config) {
       config,
       shot.buffer,
       `💸 **/pay** \`${ignResult.ign}\` — **${amountResult.display}**\n` +
-        `🖥️ \`${info.server}\` • Bedrock ${manager.detected.version ?? 'auto'} • bot \`${info.username}\`\n` +
+        `🖥️ \`${info.server}\` • Java ${manager.detected.version ?? 'auto'} • bot \`${info.username}\`\n` +
         `👮 Thực hiện bởi <@${interaction.user.id}>`
     );
   } catch (err) {
@@ -238,7 +238,7 @@ async function handleBalance(interaction, manager, config) {
     const embed = new EmbedBuilder()
       .setColor(COLOR_INFO)
       .setTitle('💰 Số dư trong game')
-      .setDescription(`Bot đã hỏi server **${info.server}** (Bedrock ${manager.detected.version ?? 'auto'})`)
+      .setDescription(`Bot đã hỏi server **${info.server}** (Java ${manager.detected.version ?? 'auto'})`)
       .addFields(
         { name: '👤 Người chơi', value: `\`${target}\``, inline: true },
         { name: '🎮 Tài khoản bot', value: `\`${info.username}\``, inline: true },
@@ -255,7 +255,7 @@ async function handleBalance(interaction, manager, config) {
       config,
       shot.buffer,
       `💰 **/balance** \`${target}\`\n` +
-        `🖥️ \`${info.server}\` • Bedrock ${manager.detected.version ?? 'auto'} • bot \`${info.username}\`\n` +
+        `🖥️ \`${info.server}\` • Java ${manager.detected.version ?? 'auto'} • bot \`${info.username}\`\n` +
         `👮 Thực hiện bởi <@${interaction.user.id}>`
     );
   } catch (err) {
@@ -305,7 +305,7 @@ async function handleSetIp(interaction, manager, config) {
   }
 
   await interaction.deferReply();
-  const finalPort = port ?? 19132;
+  const finalPort = port ?? 25565;
 
   try {
     // 1) Ping thử server mới trước khi đổi
@@ -317,12 +317,12 @@ async function handleSetIp(interaction, manager, config) {
 
     const embed = new EmbedBuilder()
       .setColor(COLOR_INFO)
-      .setTitle('🖥️ Đã đổi máy chủ Minecraft Bedrock')
+      .setTitle('🖥️ Đã đổi máy chủ Minecraft PC (Java)')
       .addFields(
         { name: '🌐 Địa chỉ mới', value: `\`${host}:${finalPort}\``, inline: true },
         {
           name: '📦 Phiên bản server',
-          value: pong?.version ? `Bedrock \`${pong.version}\` (protocol \`${pong.protocol ?? '?'}\`)` : '⚠️ Không ping được (bot vẫn sẽ thử kết nối)',
+          value: pong?.version ? `Java \`${pong.version}\` (protocol \`${pong.protocol ?? '?'}\`)` : '⚠️ Không ping được (bot vẫn sẽ thử kết nối)',
           inline: true,
         },
         { name: '👥 Người chơi', value: pong?.playersOnline != null ? `${pong.playersOnline}/${pong.playersMax ?? '?'}` : '—', inline: true },

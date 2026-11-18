@@ -25,13 +25,13 @@ const BASE_DIR = path.join(__dirname, '..');
 const DATA_DIR = path.join(BASE_DIR, 'data');
 const SERVER_FILE = path.join(DATA_DIR, 'server.json');
 
-/** Đọc mục tiêu server Bedrock do /setipserver lưu lại (nếu có) */
+/** Đọc mục tiêu server Minecraft PC (Java) do /setipserver lưu lại (nếu có) */
 function loadSavedServer() {
   try {
     const raw = fs.readFileSync(SERVER_FILE, 'utf8');
     const data = JSON.parse(raw);
     if (data && typeof data.host === 'string' && data.host) {
-      return { host: data.host, port: Number.isInteger(data.port) ? data.port : 19132 };
+      return { host: data.host, port: Number.isInteger(data.port) ? data.port : 25565 };
     }
   } catch {
     /* chưa có file — dùng .env */
@@ -70,18 +70,16 @@ const config = {
   // ---- Webhook admin ----
   adminWebhookUrl: (process.env.ADMIN_WEBHOOK_URL || '').trim(),
 
-  // ---- Minecraft Bedrock ----
+  // ---- Minecraft PC (Java Edition) ----
   username: (process.env.MC_USERNAME || 'PayBot').trim() || 'PayBot',
   authMode: (process.env.AUTH_MODE || 'offline').trim().toLowerCase() === 'online' ? 'online' : 'offline',
-  // Ghim phiên bản (rỗng = tự dò qua ping)
+  // Ghim phiên bản Java (rỗng = tự dò qua ping, VD: 1.21.4)
   mcVersion: (process.env.MC_VERSION || '').trim(),
-  // Backend RakNet (rỗng = mặc định của bedrock-protocol)
-  raknetBackend: (process.env.MC_RAKNET_BACKEND || '').trim(),
 
   // Máy chủ mục tiêu: data/server.json (nếu có) đè lên giá trị trong .env
   server: savedServer || {
     host: (process.env.MC_HOST || '').trim(),
-    port: clampInt(process.env.MC_PORT, 1, 65535, 19132),
+    port: clampInt(process.env.MC_PORT, 1, 65535, 25565),
   },
 
   // ---- Tinh chỉnh ----

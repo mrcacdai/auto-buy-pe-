@@ -177,14 +177,14 @@ async function startWebPanel({ config, manager, getContext }) {
     }
   });
 
-  /* ---------- Đổi server Bedrock ---------- */
+  /* ---------- Đổi server Minecraft PC (Java) ---------- */
   app.post('/api/server', async (req, res) => {
     try {
       const { host, port } = req.body ?? {};
       if (!host || typeof host !== 'string') {
         return res.status(400).json({ success: false, error: 'Thiếu host' });
       }
-      const portNum = Number.parseInt(port, 10) || 19132;
+      const portNum = Number.parseInt(port, 10) || 25565;
 
       console.log(`[WebPanel] Yêu cầu đổi server -> ${host}:${portNum} (đang ping thử...)`);
       const pong = await manager.probe(host, portNum);
